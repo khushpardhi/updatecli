@@ -1,0 +1,19 @@
+sources:
+  getLatestAmi:
+    plugin: aws/ami
+    kind: aws/ami
+    spec:
+      region: ap-south-1 
+      filters:
+        - name: "tag:my-ami"
+          values: "khush" 
+      sortby: creationDateDesc
+  
+targets:
+  updateAmiInConfig:
+    name: Update AWS AMI in config.json
+    kind: json
+    sourceid: getLatestAmi
+    spec:
+      file: /home/ncs/updatecli/input.json
+      key: firstName  
