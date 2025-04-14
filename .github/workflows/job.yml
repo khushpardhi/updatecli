@@ -18,3 +18,9 @@ jobs:
       - name: Run Updatecli
         run: |
           updatecli apply --config fetch_latest_aws_ami/latest_ami.yml
+          
+      - name: pull-request
+        uses: diillson/auto-pull-request@v1.0.1
+        with:
+          destination_branch: "main"
+          github_token: ${{ secrets.MY_SECRET }}
