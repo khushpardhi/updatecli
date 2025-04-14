@@ -15,5 +15,5 @@ targets:
     kind: json
     sourceid: getLatestAmi
     spec:
-      file: /home/ncs/updatecli/input.json
+      file: /home/ncs/updatecli/fetch_latest_aws_ami/input.json
       key: firstName  
