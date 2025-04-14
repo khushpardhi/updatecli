@@ -25,6 +25,11 @@ jobs:
       - name: Run Updatecli
         run: |
           updatecli apply --config fetch_latest_aws_ami/latest_ami.yml
+          
+      - name: Create feature branch
+        run: |
+          git config user.name "khushpardhi"
+          git config user.email "pardhikhush@gmail.com"
 
       - name: Check if there are changes
         id: check_changes
