@@ -29,5 +29,5 @@ jobs:
       - name: pull-request
         uses: diillson/auto-pull-request@v1.0.1
         with:
-          destination_branch: "master"
+          destination_branch: "main"
           github_token: ${{ secrets.MY_SECRET }}
