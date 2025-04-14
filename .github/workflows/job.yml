@@ -43,7 +43,7 @@ jobs:
             echo "changes=false"
           else
             git commit -m "Update AMI via UpdateCLI"
-            git push origin updatecli-ami-update
+            git push -f origin updatecli-ami-update
             echo "changes=true" 
           fi
 
