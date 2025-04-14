@@ -18,4 +18,4 @@ jobs:
 
       - name: Run Updatecli
         run: |
-          updatecli apply --config updatecli.yaml
+          updatecli apply -f latest_ami.yml
