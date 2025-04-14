@@ -32,3 +32,10 @@ jobs:
           source_branch: "updatecli-ami-update"
           destination_branch: "main"
           github_token: ${{ secrets.MY_SECRET }}
+
+      - name: Commit changes
+        run: |
+          git add .
+          git diff --cached --quiet || git commit -m "Update AMI via UpdateCLI"
+          git push origin updatecli-ami-update
+
