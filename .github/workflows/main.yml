@@ -18,4 +18,6 @@ jobs:
 
       - name: Run Updatecli
         run: |
+          cd ..
+          cd fetch_latest_aws_ami
           updatecli apply -f latest_ami.yml
