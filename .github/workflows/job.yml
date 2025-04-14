@@ -15,8 +15,11 @@ jobs:
         run: |
           curl -sL https://github.com/updatecli/updatecli/releases/latest/download/updatecli_Linux_x86_64.tar.gz | tar xz
           sudo mv updatecli /usr/local/bin/
+          sudo apt install tree -y
+          sudo tree
       - name: Run Updatecli
         run: |
           cd ../..
+          sudo tree
           cd fetch_latest_aws_ami
           updatecli apply --config latest_ami.yml
