@@ -25,6 +25,20 @@ jobs:
       - name: Run Updatecli
         run: |
           updatecli apply --config fetch_latest_aws_ami/latest_ami.yml
+
+      - name: Check if there are changes
+        id: check_changes
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes detected."
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "Update AMI via UpdateCLI"
+            git push origin updatecli-ami-update
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
           
       - name: pull-request
         uses: diillson/auto-pull-request@v1.0.1
@@ -33,9 +47,5 @@ jobs:
           destination_branch: "main"
           github_token: ${{ secrets.MY_SECRET }}
 
-      - name: Commit changes
-        run: |
-          git add .
-          git diff --cached --quiet || git commit -m "Update AMI via UpdateCLI"
-          git push origin updatecli-ami-update
+  
 
