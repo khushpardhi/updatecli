@@ -53,7 +53,7 @@ jobs:
         with:
           source_branch: "updatecli-ami-update"
           destination_branch: "main"
-          github_token: ${{ secrets.MY_SECRET }}
+          github_token: ${{ secrets.AMI_GITHUB}}
 
   
 
