@@ -40,11 +40,11 @@ jobs:
           git add .
           if git diff --cached --quiet; then
             echo "No changes detected."
-            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "changes=false"
           else
             git commit -m "Update AMI via UpdateCLI"
             git push origin updatecli-ami-update
-            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "changes=true" 
           fi
 
           
