@@ -17,4 +17,4 @@ jobs:
           sudo mv updatecli /usr/local/bin/
       - name: Run Updatecli
         run: |
-          updatecli apply -f latest_ami.yml
+          updatecli apply --config latest_ami.yml
