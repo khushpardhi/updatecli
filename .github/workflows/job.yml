@@ -22,14 +22,17 @@ jobs:
         run: |
           curl -sL https://github.com/updatecli/updatecli/releases/latest/download/updatecli_Linux_x86_64.tar.gz | tar xz
           sudo mv updatecli /usr/local/bin/
-      - name: Run Updatecli
-        run: |
-          updatecli apply --config fetch_latest_aws_ami/latest_ami.yml
-          
-      - name: Create feature branch
+      - name: Check for changes
+        run: git status
+      - name: Create and checkout feature branch
         run: |
           git config user.name "khushpardhi"
           git config user.email "pardhikhush@gmail.com"
+          git checkout -b updatecli-ami-update
+
+      - name: Run Updatecli
+        run: |
+          updatecli apply --config fetch_latest_aws_ami/latest_ami.yml
 
       - name: Check if there are changes
         id: check_changes
