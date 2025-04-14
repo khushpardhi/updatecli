@@ -1,0 +1,22 @@
+name: Run Updatecli
+
+on:
+  workflow_dispatch: # run manually
+
+jobs:
+  updatecli:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Updatecli
+        run: |
+          curl -sL https://github.com/updatecli/updatecli/releases/latest/download/updatecli_Linux_x86_64.tar.gz | tar xz
+          sudo mv updatecli /usr/local/bin/
+      - name: Run Updatecli
+        run: |
+          cd ../..
+          cd fetch_latest_aws_ami
+          updatecli apply --config latest_ami.yml
