@@ -17,4 +17,6 @@ jobs:
           sudo mv updatecli /usr/local/bin/
       - name: Run Updatecli
         run: |
+          cd ../..
+          cd fetch_latest_aws_ami
           updatecli apply --config latest_ami.yml
