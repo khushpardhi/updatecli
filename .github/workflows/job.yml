@@ -1,47 +1,51 @@
-name: Update AMI
+name: Run Updatecli
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # run manually
 
 jobs:
-  update-ami:
+  updatecli:
     runs-on: ubuntu-latest
-    env:
-      AWS_REGION: ap-southeast-2
-      AWS_DEFAULT_REGION: ap-southeast-2
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Ensures full git history for proper PR diff
 
-      - name: Set up Git
-        run: |
-          git config --global user.email "${{ secrets.MAIL_GIT }}"
-          git config --global user.name "${{ secrets.USERNAME_GIT }}"
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-      - name: Generate Dynamic Branch Name
-        id: branch
-        run: |
-          BRANCH_NAME="updatecli-ami-$(date +'%Y%m%d-%H%M%S')"
-          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
-
-      - name: Create and switch to dynamic branch
-        run: |
-          git fetch origin
-          git checkout -B ${{ steps.branch.outputs.branch_name }} origin/main
-
-      - name: Install UpdateCLI
+      - name: Install Updatecli
         run: |
           curl -sL https://github.com/updatecli/updatecli/releases/latest/download/updatecli_Linux_x86_64.tar.gz | tar xz
           sudo mv updatecli /usr/local/bin/
 
-      - name: Update input.json (example update)
-        run: |
-          sed -i 's/firstName": "[^"]*/firstName": "ami-000ed49a7fd8766b1/' fetch_latest_aws_ami/input.json
+      - name: Check for changes
+        run: git status
 
-      - name: Commit and push changes
+      - name: Configure Git
+        run: |
+          git config user.name "${{ secrets.USERNAME_GIT }}"
+          git config user.email "${{ secrets.MAIL_GIT }}"
+
+      - name: Create and checkout feature branch
+        run: |
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          BRANCH_NAME="updatecli-ami-update-$TIMESTAMP"
+          git checkout -b $BRANCH_NAME
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+        id: branch
+
+      - name: Run Updatecli
+        run: |
+          updatecli apply
+
+      - name: Check if there are changes
         id: check_changes
         run: |
           git add -A
@@ -49,17 +53,27 @@ jobs:
             echo "No changes detected."
             echo "changes=false" >> $GITHUB_OUTPUT
           else
-            COMMIT_MESSAGE="Update AMI configuration - $(date +'%Y-%m-%d %H:%M:%S')"
-            git commit -m "$COMMIT_MESSAGE"
-            git push origin ${{ steps.branch.outputs.branch_name }}
+            echo "Changes detected."
             echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit changes
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+          TIMESTAMP=$(date +%Y-%m-%dT%H:%M:%S)
+          git commit -m "Update AMI configuration - $TIMESTAMP"
+
+      - name: Debug Git Branches (optional)
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+          git remote -v
+          git branch -a
+          git log --oneline --graph --all
 
       - name: Create Pull Request
         if: steps.check_changes.outputs.changes == 'true'
-        run: |
-          gh pr create \
-            --title "Update AMI" \
-            --body "Automatically updated AMI via UpdateCLI workflow" \
-            --base main \
-            --head ${{ steps.branch.outputs.branch_name }} \
-            --repo ${{ github.repository }}
+        uses: diillson/auto-pull-request@v1.0.1
+        with:
+          source_branch: ${{ steps.branch.outputs.branch_name }}
+          destination_branch: "main"
+          github_token: ${{ secrets.AMI_GITHUB }}
