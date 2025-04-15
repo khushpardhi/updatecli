@@ -42,7 +42,7 @@ jobs:
             echo "No changes detected."
             echo "changes=false"
           else
-            git commit -m "new commit for UpdateCLI"
+            git commit -m ""
             git push -f origin updatecli-ami-update
             echo "changes=true" 
           fi
