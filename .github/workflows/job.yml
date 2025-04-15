@@ -18,8 +18,8 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
+          git config --global user.email "${{ secrets.MAIL_GIT }}"
+          git config --global user.name "${{ secrets.USERNAME_GIT }}"
 
       - name: Generate Dynamic Branch Name
         id: branch
@@ -32,7 +32,12 @@ jobs:
           git fetch origin
           git checkout -B ${{ steps.branch.outputs.branch_name }} origin/main
 
-      - name: Update input.json (example)
+      - name: Install UpdateCLI
+        run: |
+          curl -sL https://github.com/updatecli/updatecli/releases/latest/download/updatecli_Linux_x86_64.tar.gz | tar xz
+          sudo mv updatecli /usr/local/bin/
+
+      - name: Update input.json (example update)
         run: |
           sed -i 's/firstName": "[^"]*/firstName": "ami-000ed49a7fd8766b1/' fetch_latest_aws_ami/input.json
 
@@ -49,14 +54,9 @@ jobs:
             git push origin ${{ steps.branch.outputs.branch_name }}
             echo "changes=true" >> $GITHUB_OUTPUT
 
-      - name: Install GitHub CLI
-        if: steps.check_changes.outputs.changes == 'true'
-        uses: cli/cli-action@v2
-
-      - name: Create Pull Request using GitHub CLI
+      - name: Create Pull Request
         if: steps.check_changes.outputs.changes == 'true'
         run: |
-          echo "${{ secrets.AMI_GITHUB }}" | gh auth login --with-token
           gh pr create \
             --title "Update AMI" \
             --body "Automatically updated AMI via UpdateCLI workflow" \
