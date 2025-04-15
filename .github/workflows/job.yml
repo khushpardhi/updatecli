@@ -9,12 +9,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4  # Updated to latest version
-        with:
-          fetch-depth: 0  # Ensures full git history for proper PR diff
+        uses: actions/checkout@v3
 
       - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4  # Updated to latest version
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
@@ -25,18 +23,14 @@ jobs:
           curl -sL https://github.com/updatecli/updatecli/releases/latest/download/updatecli_Linux_x86_64.tar.gz | tar xz
           sudo mv updatecli /usr/local/bin/
 
-      - name: Configure Git
-        run: |
-          git config user.name "${{ secrets.USERNAME_GIT }}"
-          git config user.email "${{ secrets.MAIL_GIT }}"
+      - name: Check for changes
+        run: git status
 
       - name: Create and checkout feature branch
-        id: branch
         run: |
-          TIMESTAMP=$(date +%Y%m%d%H%M%S)
-          BRANCH_NAME="updatecli-ami-update-$TIMESTAMP"
-          git checkout -b $BRANCH_NAME
-          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          git config user.name ${{ secrets.USERNAME_GIT }}
+          git config user.email ${{ secrets.MAIL_GIT }}
+          git checkout -b updatecli-ami-update
 
       - name: Run Updatecli
         run: |
@@ -50,22 +44,15 @@ jobs:
             echo "No changes detected."
             echo "changes=false" >> $GITHUB_OUTPUT
           else
-            COMMIT_MESSAGE="Update AMI configuration - $(date +'%Y-%m-%dT%H:%M:%S')"
+            COMMIT_MESSAGE="Update AMI configuration - $(date +'%Y-%m-%d %H:%M:%S')"
             git commit -m "$COMMIT_MESSAGE"
-            git push -u origin ${{ steps.branch.outputs.branch_name }}
+            git push -f origin updatecli-ami-update
             echo "changes=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create Pull Request
-        if: steps.check_changes.outputs.changes == 'true'
-        uses: peter-evans/create-pull-request@v7  # More reliable PR action
+      - name: pull-request
+        uses: diillson/auto-pull-request@v1.0.1
         with:
-          token: ${{ secrets.AMI_GITHUB }}
-          branch: ${{ steps.branch.outputs.branch_name }}
-          base: main
-          title: "Update AMI configuration - ${{ steps.branch.outputs.branch_name }}"
-          body: |
-            Automated update of AMI configuration by Updatecli.
-            Changes applied on ${{ steps.branch.outputs.branch_name }}.
-          commit-message: "Update AMI configuration - ${{ steps.branch.outputs.branch_name }}"
-          delete-branch: true  # Deletes branch after PR is merged
+          source_branch: "updatecli-ami-update"
+          destination_branch: "main"
+          github_token: ${{ secrets.AMI_GITHUB}}
