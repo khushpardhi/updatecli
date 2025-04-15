@@ -42,7 +42,7 @@ jobs:
             echo "No changes detected."
             echo "changes=false"
           else
-            git commit -m ""
+            git commit -m "this is first massege"
             git push -f origin updatecli-ami-update
             echo "changes=true" 
           fi
