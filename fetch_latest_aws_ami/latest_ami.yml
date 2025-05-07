@@ -1,12 +1,13 @@
 sources:
   getLatestAmi:
-    name: Get latest AMI from AWS
+    plugin: aws/ami
     kind: aws/ami
     spec:
-      region: ap-south-1
+      region: ap-south-1 
+      filters:
+        - name: "tag:my-ami"
+          values: "khush" 
       sortby: creationDateDesc
-      owners:
-        - self
   
 targets:
   updateAmiInConfig:
