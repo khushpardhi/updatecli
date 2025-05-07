@@ -1,13 +1,13 @@
 sources:
   getLatestAmi:
-    plugin: aws/ami
+    name: Get latest AMI from AWS
     kind: aws/ami
     spec:
-      region: ap-south-1 
-      filters:
-        - name: "tag:my-ami"
-          values: "khush" 
+      region: ap-south-1
       sortby: creationDateDesc
+      filters:
+         - name: "name"
+           values: "amazon-eks-gpu*"
   
 targets:
   updateAmiInConfig:
