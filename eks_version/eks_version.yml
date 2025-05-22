@@ -16,6 +16,6 @@ targets:
     kind: file
     sourceid: latestEKSVersion
     spec:
-      file: input.tf
+      file: eks_version/input.tf
       matchpattern: 'default\s+=\s+".*?"'
       replacepattern: 'default = "{{ source `latestEKSVersion` }}"'
