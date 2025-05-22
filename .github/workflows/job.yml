@@ -57,6 +57,6 @@ jobs:
       - name: pull-request
         uses: diillson/auto-pull-request@v1.0.1
         with:
-          source_branch: "$BRANCH_NAME"
+          source_branch: "${{ env.BRANCH_NAME }}"
           destination_branch: "main"
           github_token: ${{ secrets.AMI_GITHUB}}
