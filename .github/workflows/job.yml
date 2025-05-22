@@ -32,10 +32,16 @@ jobs:
           git config user.email ${{ secrets.MAIL_GIT }}
           git checkout -b updatecli-ami-update
 
-      - name: Run Updatecli
+     - name: Run UpdateCLI for AMI
+        working-directory: ./fetch_latest_aws_ami
         run: |
-          updatecli apply --config fetch_latest_aws_ami/latest_ami.yml
-          updatecli apply --config eks_version/eks_version.yml
+          updatecli apply --config latest_ami.yml
+
+      - name: Run UpdateCLI for EKS Version
+        working-directory: ./eks_version
+        run: |
+          updatecli apply --config eks_version.yml
+
 
       - name: Check if there are changes
         id: check_changes
