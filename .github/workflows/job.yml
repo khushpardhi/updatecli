@@ -28,12 +28,13 @@ jobs:
 
       - name: Create and checkout feature branch
         run: |
-          git config user.name ${{ secrets.USERNAME_GIT }}
-          git config user.email ${{ secrets.MAIL_GIT }}
-          BRANCH_NAME="updatecli-ami-update-$(date +'%Y%m%d-%H%M%S')"
-          echo "Using branch name: $BRANCH_NAME"
-          git checkout -b "$BRANCH_NAME"
-          echo "Using branch name: $BRANCH_NAME"
+         git config user.name "${{ secrets.USERNAME_GIT }}"
+         git config user.email "${{ secrets.MAIL_GIT }}"
+         BRANCH_NAME="updatecli-ami-update-$(date +'%Y%m%d-%H%M%S')"
+         echo "Using branch name: $BRANCH_NAME"
+         git checkout -b "$BRANCH_NAME"
+         echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV  # ✅ Make available to future steps
+
 
       - name: Run Updatecli
         run: |
