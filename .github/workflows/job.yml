@@ -18,6 +18,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ap-southeast-2
 
+      - name: Debug EKS versions
+        run: |
+          aws eks describe-addon-versions \
+            --region ap-southeast-2 \
+            --query "addons[].addonVersions[].compatibilities[].clusterVersion" \
+            --output text | tr '\t' '\n' | sort -uV | tail -n 5 | paste -sd ',' -
+
+
       - name: Install Updatecli
         run: |
           curl -sL https://github.com/updatecli/updatecli/releases/latest/download/updatecli_Linux_x86_64.tar.gz | tar xz
