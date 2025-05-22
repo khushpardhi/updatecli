@@ -1,0 +1,21 @@
+name: "Update EKS Cluster Version in input.tf"
+
+sources:
+  latestEKSVersion:
+    kind: shell
+    name: Get latest EKS version from AWS CLI
+    spec:
+      command: |
+        aws eks describe-addon-versions \
+          --query "addons[].addonVersions[].compatibilities[].clusterVersion" \
+          --output text | tr '\t' '\n' | sort -uV | tail -n 5 | paste -sd ',' -
+
+targets:
+  UpdateInputTF:
+    name: Update EKS versions in input.tf
+    kind: file
+    sourceid: latestEKSVersion
+    spec:
+      file: input.tf
+      matchpattern: 'default\s+=\s+".*?"'
+      replacepattern: 'default = "{{ source `latestEKSVersion` }}"'
