@@ -6,7 +6,7 @@ sources:
     name: Get latest EKS version from AWS CLI
     spec:
       command: >
-        aws eks describe-addon-versions --query "addons[].addonVersions[].compatibilities[].clusterVersion" --output text | tr '\t' '\n' | sort -uV | tail -n 5 | paste -sd ',' -
+        aws eks describe-addon-versions --query "addons[].addonVersions[].compatibilities[].clusterVersion" --output text | tr '\t' '\n' | sort -uV | tail -n 5 | paste -sd ',' 
 
 targets:
   UpdateInputTF:
